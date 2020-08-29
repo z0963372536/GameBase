@@ -33,18 +33,18 @@ public class UsersService {
 		}
 		return finUserData;
 	}
-	
+
 	public Map<String, Object> getByLogin(UserData userData) {
-		String acct= userData.getAccount();
+		String acct = userData.getAccount();
 		String pwd = userData.getPassword();
-		String encryptPwd= getMD5Endocing(pwd);
-		UserData loginUserData =null;
+		String encryptPwd = getMD5Endocing(pwd);
+		UserData loginUserData = null;
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			loginUserData = userDataDao.getByAcctPwd(acct, encryptPwd);
-			
+
 		} catch (Exception e) {
-			// TODO: handle exception
+			System.out.println("UsersService getByLogin Exception: " + e.getMessage());
 		}
 		return result;
 	}
