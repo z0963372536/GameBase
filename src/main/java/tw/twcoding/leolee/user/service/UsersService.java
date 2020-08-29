@@ -3,6 +3,7 @@ package tw.twcoding.leolee.user.service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -10,7 +11,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import tw.twcoding.leolee.user.dao.UserDataDao;
+import tw.twcoding.leolee.user.dao.UsersInfoDao;
 import tw.twcoding.leolee.user.model.UserData;
+import tw.twcoding.leolee.user.model.UsersInfo;
 import tw.twcoding.leolee.util.MailSender;
 
 @Service
@@ -18,6 +21,8 @@ public class UsersService {
 
 	@Autowired
 	private UserDataDao userDataDao;
+	@Autowired
+	private UsersInfoDao userInfoDao;
 	@Autowired
 	private MailSender mailSender;
 
@@ -39,12 +44,18 @@ public class UsersService {
 		String pwd = userData.getPassword();
 		String encryptPwd = getMD5Endocing(pwd);
 		UserData loginUserData = null;
+		UsersInfo loginUsersInfo = null;
 		Map<String, Object> result = new HashMap<String, Object>();
 		try {
 			loginUserData = userDataDao.getByAcctPwd(acct, encryptPwd);
-
+			if (loginUserData != null) {
+				loginUsersInfo = showUsersInfo(acct);
+			}
+			result.put("loginUser", loginUsersInfo);
+			result.put("status", true);
 		} catch (Exception e) {
 			System.out.println("UsersService getByLogin Exception: " + e.getMessage());
+			return result;
 		}
 		return result;
 	}
@@ -89,5 +100,19 @@ public class UsersService {
 			System.out.println("genRandomPwd Exception:" + e.getMessage());
 		}
 		return pwd.toString();
+	}
+
+	private UsersInfo showUsersInfo(String acct) {
+		UsersInfo usersInfo = null;
+		List<UsersInfo> friends = null;
+		try {
+			usersInfo = userInfoDao.getByAcct(acct);
+			friends = userInfoDao.getFriendListByUserId(usersInfo.getUserId());
+			usersInfo.setFriendsList(friends);
+		} catch (Exception e) {
+			System.out.println("UsersService showUsersInfo Exception: " + e.getMessage());
+			return usersInfo;
+		}
+		return usersInfo;
 	}
 }

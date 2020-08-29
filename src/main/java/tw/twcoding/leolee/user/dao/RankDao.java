@@ -1,5 +1,7 @@
 package tw.twcoding.leolee.user.dao;
 
+import java.util.List;
+
 import org.hibernate.SessionFactory;
 import org.hibernate.query.Query;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,5 +27,18 @@ public class RankDao {
 			return rank;
 		}
 		return rank;
+	}
+
+	public List<Rank> getAllRanks() {
+		String sqlStr = "From Rank";
+		List<Rank> ranks = null;
+		try {
+			Query<Rank> query = sessionFactory.getCurrentSession().createQuery(sqlStr, Rank.class);
+			ranks = query.list();
+		} catch (Exception e) {
+			System.out.println("RankDao getAllRanks Exception: " + e.getMessage());
+			return ranks;
+		}
+		return ranks;
 	}
 }
